@@ -24,10 +24,17 @@ def get_if():
 
 def handle_pkt(pkt):
     if MyTunnel in pkt or (TCP in pkt and pkt[TCP].dport == 1234):
-        print "got a packet"
-        pkt.show2()
-#        hexdump(pkt)
-#        print "len(pkt) = ", len(pkt)
+        #extracting our custom header from the packet
+        response=pkt[MyTunnel]
+        op=response.op
+        new_value=response.new_value
+        print "----------"
+        if op=='h':
+            print "humidity: ", new_value
+        elif op=='t':
+            print "temperture: ", new_value
+        elif op=='p':
+            print "pressure: ", new_value
         sys.stdout.flush()
 
 
@@ -36,9 +43,7 @@ def main():
     iface = ifaces[0]
     print "sniffing on %s" % iface
     sys.stdout.flush()
-    sniff(iface = iface,
-          prn = lambda x: handle_pkt(x))
+    sniff(iface = iface,prn = lambda x: handle_pkt(x))
 
 if __name__ == '__main__':
     main()
-
